@@ -1,6 +1,6 @@
 ## Module attributes ###################################################
 #
-# Inspects the attributes of a file system Node.
+# Inspects/mutates the attributes of a file system Node.
 #
 # 
 # Copyright (c) 2013 Quildreen "Sorella" Motta <quildreen@gmail.com>
@@ -26,7 +26,9 @@
 
 ### -- Dependencies ----------------------------------------------------
 fs = require 'fs'
+path = require 'path'
 {lift-node} = require 'pinky-for-fun'
+{pipeline, all} = require 'pinky-combinators'
 
 
 ### -- Attributes ------------------------------------------------------
@@ -66,20 +68,87 @@ link-status = lift-node fs.lstat
 # Checks if a Node is a file node.
 #
 # :: String -> Promise Bool
-is-file = (path) -> (status path).then (.is-file!)
+is-file = (path-name) -> (status path-name).then (.is-file!)
 
 
 #### λ is-directory
 # Checks if a Node is a directory node.
 #
 # :: String -> Promise Bool
-is-directory = (path) -> (status path).then (.is-directory!)
+is-directory = (path-name) -> (status path-name).then (.is-directory!)
 
 
+### -- File ownership --------------------------------------------------
+
+#### λ change-owner
+# Changes the ownership of a single node.
+#
+# See also: `chown(2)`
+#
+# :: String -> UserID -> GroupID -> Promise String
+chown = lift-node fs.chown
+change-owner = (user-id, group-id, path-name) -->
+  promise = pinky!
+  (chown path-name, user-id, group-id).then do
+                                            * -> promise.fulfill path-name
+                                            * promise.reject
+  return promise
+
+
+#### λ change-link-owner
+# Changes the ownership of a single node, without dereferencing symbolic
+# links.
+#
+# See also: `lchown(2)`, `change-owner`
+#
+# :: String -> UserID -> GroupID -> Promise String
+lchown = lift-node fs.lchown
+change-link-owner = (user-id, group-id, path-name) -->
+  promise = pinky!
+  (chown path-name, user-id, group-id).then do
+                                            * -> promise.fulfill path-name
+                                            * promise.reject
+  return promise                                       
+
+
+#### λ change-owner-recursive
+# Like `change-owner`, but also changes the ownership of
+# sub-directories/files.
+#
+# :: String -> UserID -> GroupID -> Promise String
+list-dir = lift-node fs.readdir
+change-owner-recursive = (user-id, group-id, path-name) -->
+  promise    = pinky!
+  change-one = change-owner user-id, group-id
+
+  (status path-name).then (info) ->
+    | info.is-file!      => change-one path-name .then do
+                              * -> promise.fulfill path-name
+                              * promise.reject
+    | info.is-directory! => change-whole-subtree!
+
+  return promise
+
+  function change-whole-subtree()
+    keep-changing = change-owner-recursive user-id, group-id
+    files         = list-dir path-name
+    change-files  = files.then (xs) -> xs.map keep-changing . fix-path
+
+    pipeline [ (all change-files), change-one path-name ].then do
+      * -> promise.fulfill path-name
+      * promise.reject
+    
+  function fix-path(file-name)
+    path.resolve path-name, file-name
+
+
+
+  
 
 
 ### -- Exports ---------------------------------------------------------
 module.exports = {
   status, link-status
   is-file, is-directory
+  change-owner, change-link-owner, change-owner-recursive  
 }

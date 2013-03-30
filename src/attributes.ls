@@ -85,7 +85,7 @@ is-directory = (path-name) -> (status path-name).then (.is-directory!)
 #
 # See also: `chown(2)`
 #
-# :: String -> UserID -> GroupID -> Promise String
+# :: UserID -> GroupID -> String -> Promise String
 chown = lift-node fs.chown
 change-owner = (user-id, group-id, path-name) -->
   promise = pinky!
@@ -101,7 +101,7 @@ change-owner = (user-id, group-id, path-name) -->
 #
 # See also: `lchown(2)`, `change-owner`
 #
-# :: String -> UserID -> GroupID -> Promise String
+# :: UserID -> GroupID -> String -> Promise String
 lchown = lift-node fs.lchown
 change-link-owner = (user-id, group-id, path-name) -->
   promise = pinky!
@@ -115,7 +115,7 @@ change-link-owner = (user-id, group-id, path-name) -->
 # Like `change-owner`, but also changes the ownership of
 # sub-directories/files.
 #
-# :: String -> UserID -> GroupID -> Promise String
+# :: UserID -> GroupID -> String -> Promise String
 list-dir = lift-node fs.readdir
 change-owner-recursive = (user-id, group-id, path-name) -->
   promise    = pinky!

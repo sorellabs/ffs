@@ -142,8 +142,23 @@ change-owner-recursive = (user-id, group-id, path-name) -->
     path.resolve path-name, file-name
 
 
+### -- File modes ------------------------------------------------------
 
-  
+#### λ change-mode
+# Changes the mode of a single file node.
+#
+# See also: `chmod(2)`
+#
+# :: FileMode -> String -> Promise String
+chmod = lift-node fs.chmod
+change-mode = (mode, path-name) -->
+  promise = pinky!
+  (chmod path-name, mode).then do
+                               * -> promise.fulfill path-name
+                               * promise.reject
+  return promise
+
+
 
 
 ### -- Exports ---------------------------------------------------------

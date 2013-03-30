@@ -1,0 +1,54 @@
+== Future FileSystem ===================================================
+--
+-- This library provides wrappers around Node.js's file system utilities
+-- using promises instead of callbacks. This allows for better
+-- composition throughout the code.
+--
+
+== Directory
+
+Interface DirectoryOptions
+  mode      :: Number  -- Octal permissions
+  recursive :: Boolean -- Handle all the parent tree
+
+Interface DirectoryListOptions
+  recursive :: Boolean -- Lists all the subtrees
+
+Interface Directory
+  make   :: path:String, options:DirectoryOptions? -> Promise
+  remove :: path:String, options:DirectoryOptions? -> Promise
+  list   :: path:String, options:DirectoryListOptions? -> Promise
+  
+
+== File
+
+Interface File
+  make :: path:String -> Promise
+  read :: path:String, encoding:String? -> Promise
+  remove :: path:String -> Promise
+  write :: path:String, data:String, encoding:String? -> Promise
+  append :: path:String, data:String, encoding:String? -> Promise
+  truncate :: path:String, len:Number -> Promise
+
+== Path
+
+Interface Path
+  move :: path:String, to:String -> Promise
+
+== Permissions
+
+Interface Permissions
+  change-owner :: path:String, uid, gid -> Promise
+  change-mode :: path:String, mode:Number -> Promise
+
+== Attributes
+
+Interface Attributes
+  
+
+== Links
+
+Interface Link
+  symlink :: path:String, name:String, type:String -> Promise
+  hard-link :: path:String, dest:String -> Promise
+  read-link :: path:String -> Promise

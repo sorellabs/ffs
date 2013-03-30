@@ -55,7 +55,7 @@ status = lift-node fs.stat
 link-status = lift-node fs.lstat
 
 
-### -- File predicates ----------------------------n---------------------
+### -- File predicates -------------------------------------------------
 #
 # For one-off type checking on files, these provide a convenient to
 # that, rather than stating and then transforming the resulting promise

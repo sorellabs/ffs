@@ -158,6 +158,50 @@ change-mode = (mode, path-name) -->
                                * promise.reject
   return promise
 
+#### λ change-link-mode
+# Changes the mode of a single file node, without dereferencing symbolic
+# links.
+#
+# See also: `lchmod(2)`
+#
+# :: FileMode -> String -> Promise String
+lchmod = lift-node fs.lchmod
+change-link-mode = (mode, path-name) -->
+  promise = pinky!
+  (lchmod path-name, mode).then do
+                                * -> promise.fulfill path-name
+                                * promise.reject
+  return promise
+
+
+#### λ change-mode-recursive
+# Changes the mode of all files within the given path.
+#
+# :: FileMode -> String -> Promise String
+change-mode-recursive = (mode, path-name) -->
+  promise    = pinky!
+  change-one = change-mode mode
+
+  (status path-name).then (info) ->
+    | info.is-file!      => change-one path-name .then do
+                              * -> promise.fulfill path-name
+                              * promise.reject
+    | info.is-directory! => change-whole-subtree!
+
+  return promise
+
+  function change-whole-subtree()
+    keep-changing = change-mode-recursive user-id, group-id
+    files         = list-dir path-name
+    change-files  = files.then (xs) -> xs.map keep-changing . fix-path
+
+    pipeline [ (all change-files), change-one path-name ].then do
+      * -> promise.fulfill path-name
+      * promise.reject
+    
+  function fix-path(file-name)
+    path.resolve path-name, file-name
+  
 
 
 
@@ -166,4 +210,5 @@ module.exports = {
   status, link-status
   is-file, is-directory
   change-owner, change-link-owner, change-owner-recursive  
+  change-mode, change-link-mode, change-mode-recursive
 }

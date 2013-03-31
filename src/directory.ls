@@ -42,6 +42,18 @@ pinky = require 'pinky'
 # :: String -> String
 parent = (p) -> path.resolve p, '..'
 
+#### λ already-exists
+# Checks if the error signals a node already exists in the fs.
+#
+# :: Error -> Bool
+already-exists = (err) -> err.code is 'EEXIST'
+
+#### λ doesnt-exist
+# Checks if the error signals a node doesn't exist in the fs.
+#
+# :: Error -> Bool
+doesnt-exist = (err) -> err.code is 'ENOENT'
+
 
 ### -- Creating directories --------------------------------------------
 
@@ -66,14 +78,15 @@ make-recursive = (mode, path-name) -->
   promise = pinky!
   (make mode, path-name).then do
     * (_)     -> promise.fulfill!
-    * (error) ->
+    * (error) -> 
               | already-exists error => promise.fulfill!
               | doesnt-exist error   => do
-                                        p = pipeline [ (-> make mode, parent path-name)
-                                                       (-> make mode, path-name) ]
+                                        p = pipeline [(-> make-recursive mode, parent path-name)
+                                                      (-> make mode, path-name) ]
                                         p.then do
                                                * -> promise.fulfill!
                                                * promise.reject
+              | otherwise            => promise.reject error
   return promise
 
 

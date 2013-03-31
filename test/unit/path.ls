@@ -13,8 +13,8 @@ describe 'λ exists' ->
 
 describe 'λ move' ->
   o 'Should move something from a path to another.' ->
-     pipeline [(-> $.move 'root/lib', 'root/usr')
-              ,(-> expect (all [($.exists 'root/lib'),($.exists 'root/usr')]) .to.become [false,true])]
+     pipeline [(-> $.move 'root/lib1', 'root/usr')
+              ,(-> expect (all [($.exists 'root/lib1'),($.exists 'root/usr')]) .to.become [false,true])]
 
 
 describe 'λ remove' ->

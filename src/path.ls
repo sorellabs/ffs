@@ -29,8 +29,9 @@ fs = require 'fs'
 path = require 'path'
 
 pinky = require 'pinky'
-{lift-node, lift} = require 'pinky-for-fun'
+{lift-node} = require 'pinky-for-fun'
 {status} = require './attributes'
+{walk-tree} = require './utils'
 
 
 ### -- Core path routines ----------------------------------------------
@@ -39,7 +40,10 @@ pinky = require 'pinky'
 # Checks if the given path exists in the file system.
 #
 # :: String -> Promise Bool
-exists = lift fs.exists
+exists = (path-name) ->
+  promise = pinky!
+  fs.exists path-name, promise.fulfill
+  return promise
 
 
 #### λ move
@@ -77,4 +81,4 @@ remove-recursive = (path-name) ->
 
 
 ### -- Exports ---------------------------------------------------------
-module.exports = { exists, rename, remove, remove-recursive }
+module.exports = { exists, move, remove, remove-recursive }

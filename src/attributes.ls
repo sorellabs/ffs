@@ -27,6 +27,7 @@
 ### -- Dependencies ----------------------------------------------------
 fs = require 'fs'
 path = require 'path'
+pinky = require 'pinky'
 {lift-node} = require 'pinky-for-fun'
 {pipeline, all} = require 'pinky-combinators'
 {walk-tree} = require './utils'

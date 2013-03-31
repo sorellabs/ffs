@@ -8,7 +8,14 @@ global.o      = it
 global.expect = chai.expect
 process.chdir (path.resolve __dirname, 'fixtures')
 
-require './unit/attributes'
-require './unit/directory'
-require './unit/file'
-require './unit/path'
+describe '{} Attributes' ->
+  require './unit/attributes'
+
+describe '{} Directory' ->
+  require './unit/directory'
+
+describe '{} File' ->
+  require './unit/file'
+
+describe '{} Path' ->
+  require './unit/path'

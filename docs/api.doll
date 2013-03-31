@@ -30,7 +30,6 @@ Module directory
   
 
 Module file
-  touch :: String -> Promise String
   read :: Encoding -> String -> Promise String
   write :: Encoding -> String -> String -> Promise String
   append :: Encoding -> String -> String -> Promise String

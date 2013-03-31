@@ -14,37 +14,31 @@ Module attributes
   is-directory :: String -> Promise Bool
 
   -- ** Mutations
-  change-mode :: String -> Promise String
-  change-mode-recursive :: String -> Promise String
-  change-link-mode :: String -> Promise String
-  change-owner :: String -> Promise String
-  change-owner-recursive :: String -> Promise String
-  change-link-owner :: String -> Promise String
+  change-mode :: String -> Promise ()
+  change-mode-recursive :: String -> Promise ()
+  change-link-mode :: String -> Promise ()
+  change-owner :: String -> Promise ()
+  change-owner-recursive :: String -> Promise ()
+  change-link-owner :: String -> Promise ()
   
 
 Module directory
-  make :: String -> Promise String
-  make-recursive :: String -> Promise String
+  make :: String -> Promise ()
+  make-recursive :: String -> Promise ()
   list :: String -> Promise [String]
   list-recursive :: String -> Promise [String]
   
 
 Module file
   read :: Encoding -> String -> Promise String
-  write :: Encoding -> String -> String -> Promise String
-  append :: Encoding -> String -> String -> Promise String
-  truncate :: Number -> String -> Promise String
+  write :: Encoding -> String -> String -> Promise ()
+  append :: Encoding -> String -> String -> Promise ()
+  truncate :: Number -> String -> Promise ()
 
 
 Module path
-  move :: String -> String -> Promise String
-  copy :: String -> String -> Promise String
-  copy-recursive :: String -> String -> Promise String
-  remove :: String -> Promise String
-  remove-recursive :: String -> String -> Promise String
-
-
-Module link
-  symlink :: path:String, name:String, type:String -> Promise
-  hard-link :: path:String, dest:String -> Promise
-  read-link :: path:String -> Promise
+  move :: String -> String -> Promise ()
+  copy :: String -> String -> Promise ()
+  copy-recursive :: String -> String -> Promise ()
+  remove :: String -> Promise ()
+  remove-recursive :: String -> String -> Promise ()

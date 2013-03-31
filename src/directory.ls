@@ -113,7 +113,7 @@ list-recursive = (dir) ->
     | otherwise      => xs.reduce (++)
 
   function maybe-list(x) => (lift-node fs.stat) x .then (stats) ->
-    | stats.is-directory x => list-recursive x
+    | stats.is-directory x => list-recursive x .then -> [x] ++ it
     | stats.is-file x      => pinky [x]
 
 

@@ -33,7 +33,6 @@ Module file
   read :: Encoding -> String -> Promise String
   write :: Encoding -> String -> String -> Promise ()
   append :: Encoding -> String -> String -> Promise ()
-  truncate :: Number -> String -> Promise ()
 
 
 Module path

@@ -55,14 +55,6 @@ append-file = lift-node fs.append-file
 append = (options, path-name, data) --> append-file path-name, data, options
 
 
-#### λ truncate
-# Truncates the contents of a file.
-#
-# :: Number -> String -> Promise ()
-ntruncate = lift-node fs.truncate
-truncate = (length, path-name) --> ntruncate path-name, length
-
-
 
 ### -- Exports ---------------------------------------------------------
-module.exports = { read, write, append, truncate }
+module.exports = { read, write, append }

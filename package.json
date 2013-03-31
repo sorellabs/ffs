@@ -1,6 +1,6 @@
 {
   "name": "ffs",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A high-level promised wrapper on Node's FS module. For fuck's sake!",
   "main": "./lib/index.js",
   "devDependencies": {

@@ -1,3 +1,4 @@
+
 == Future FileSystem ===================================================
 --
 -- This library provides wrappers around Node.js's file system utilities
@@ -5,50 +6,46 @@
 -- composition throughout the code.
 --
 
-== Directory
+Module attributes
+  status :: String -> Promise Stats
+  link-status :: String -> Promise Stats
+  -- ** Convenience
+  is-file :: String -> Promise Bool
+  is-directory :: String -> Promise Bool
 
-Interface DirectoryOptions
-  mode      :: Number  -- Octal permissions
-  recursive :: Boolean -- Handle all the parent tree
-
-Interface DirectoryListOptions
-  recursive :: Boolean -- Lists all the subtrees
-
-Interface Directory
-  make   :: path:String, options:DirectoryOptions? -> Promise
-  remove :: path:String, options:DirectoryOptions? -> Promise
-  list   :: path:String, options:DirectoryListOptions? -> Promise
+  -- ** Mutations
+  change-mode :: String -> Promise String
+  change-mode-recursive :: String -> Promise String
+  change-link-mode :: String -> Promise String
+  change-owner :: String -> Promise String
+  change-owner-recursive :: String -> Promise String
+  change-link-owner :: String -> Promise String
   
 
-== File
-
-Interface File
-  make :: path:String -> Promise
-  read :: path:String, encoding:String? -> Promise
-  remove :: path:String -> Promise
-  write :: path:String, data:String, encoding:String? -> Promise
-  append :: path:String, data:String, encoding:String? -> Promise
-  truncate :: path:String, len:Number -> Promise
-
-== Path
-
-Interface Path
-  move :: path:String, to:String -> Promise
-
-== Permissions
-
-Interface Permissions
-  change-owner :: path:String, uid, gid -> Promise
-  change-mode :: path:String, mode:Number -> Promise
-
-== Attributes
-
-Interface Attributes
+Module directory
+  make :: String -> Promise String
+  make-recursive :: String -> Promise String
+  list :: String -> Promise [String]
+  list-recursive :: String -> Promise [String]
   
 
-== Links
+Module file
+  touch :: String -> Promise String
+  read :: Encoding -> String -> Promise String
+  write :: Encoding -> String -> String -> Promise String
+  append :: Encoding -> String -> String -> Promise String
+  truncate :: Number -> String -> Promise String
 
-Interface Link
+
+Module path
+  move :: String -> String -> Promise String
+  copy :: String -> String -> Promise String
+  copy-recursive :: String -> String -> Promise String
+  remove :: String -> Promise String
+  remove-recursive :: String -> String -> Promise String
+
+
+Module link
   symlink :: path:String, name:String, type:String -> Promise
   hard-link :: path:String, dest:String -> Promise
   read-link :: path:String -> Promise

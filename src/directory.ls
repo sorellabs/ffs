@@ -2,9 +2,9 @@
 #
 # Directory handling utilities.
 #
-# 
+#
 # Copyright (c) 2013 Quildreen "Sorella" Motta <quildreen@gmail.com>
-# 
+#
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
 # (the "Software"), to deal in the Software without restriction,
@@ -12,10 +12,10 @@
 # publish, distribute, sublicense, and/or sell copies of the Software,
 # and to permit persons to whom the Software is furnished to do so,
 # subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be
 # included in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -31,6 +31,7 @@ fs    = require 'fs'
 pinky = require 'pinky'
 {lift-node} = require 'pinky-for-fun'
 {pipeline, all} = require 'pinky-combinators'
+{walk-tree} = require './utils'
 
 
 ### -- Helpers ---------------------------------------------------------
@@ -51,37 +52,34 @@ parent = (p) -> path.resolve p, '..'
 # if the directory itself already exists. To recursively create all
 # directories in a given `path`, use `make-recursive`.
 #
-# :: Mode -> String -> Promise () FileError
-make = (mode, path) --> (lift-node fs.mkdir) path, mode
-  
+# :: Mode -> String -> Promise String FileError
+mkdir = lift-node fs.mkdir
+make = (mode, path) -->
+  promise = pinky!
+  (mkdir path, mode).then do
+                          * -> promise.fulfill path
+                          * promise.reject
+  return promise
+
+
 #### λ make-recursive
 # Creates the directory defined by `path`, and all of its pernt
 # directories.
 #
-# :: Mode -> String -> Promise () FileError
+# :: Mode -> String -> Promise String FileError
 make-recursive = (mode, path) -->
   promise = pinky!
   (make mode, path).then do
-    * (_)     -> promise.fulfill!
-    * (error) -> 
-              | already-exists error => promise.fulfill!
+    * (_)     -> promise.fulfill path
+    * (error) ->
+              | already-exists error => promise.fulfill path
               | doesnt-exist error   => do
                                         p = pipeline [ (-> make mode, parent path)
                                                        (-> make mode, path) ]
-                                        p.then (-> promise.fulfill!), promise.reject
-  return promise                                          
-
-
-### -- Removing directories --------------------------------------------
-
-#### λ remove
-# Removes the directory defined by `path`.
-#
-# Fails if the directory isn't empty, or if you don't have permissions
-# to remove it.
-#
-# :: String -> Promise () FileError
-remove = lift-node fs.rmdir
+                                        p.then do
+                                               * -> promise.fulfill path
+                                               * promise.reject
+  return promise
 
 
 ### -- Inspecting directories ------------------------------------------
@@ -92,6 +90,7 @@ remove = lift-node fs.rmdir
 # :: String -> Promise [String] Error
 list = lift-node fs.readdir
 
+
 #### λ list-recursive
 # Lists the contents of a directory and all its subdirectories.
 #
@@ -99,7 +98,7 @@ list = lift-node fs.readdir
 list-recursive = (dir) ->
   return (list dir).then (files) ->
             all (files.map maybe-list . (-> path.join dir, it)) .then flatten
-            
+
 
   function flatten(xs) => switch
     | xs.length is 0 => []
@@ -114,6 +113,5 @@ list-recursive = (dir) ->
 ### -- Exports ---------------------------------------------------------
 module.exports = {
   make, make-recursive
-  remove
-  list, list-recursive 
+  list, list-recursive
 }

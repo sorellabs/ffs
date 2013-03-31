@@ -11,7 +11,7 @@
   },
   "scripts": {
     "cc": "./node_modules/.bin/lsc -o lib -c src/*.ls",
-    "test-cc": "rm -r lib-test && ./node_modules/.bin/lsc -o lib-test -c test/*.ls && ./node_modules/.bin/lsc -o lib-test/unit -c test/unit/*.ls",
+    "test-cc": "rm -rf lib-test && ./node_modules/.bin/lsc -o lib-test -c test/*.ls && ./node_modules/.bin/lsc -o lib-test/unit -c test/unit/*.ls",
     "pretest": "npm run-script cc && npm run-script test-cc && cp -r test/fixtures lib-test/",
     "test": "./node_modules/.bin/mocha lib-test/*.js",
     "pretest-browser": "npm run-script pretest && ./node_modules/.bin/browserify -o test/browser/suite-bundle.js -e test/browser/suite.js",
@@ -65,7 +65,7 @@
     "harness": "mocha"
   },
   "dependencies": {
-    "pinky-combinators": "~0.1.0",
+    "pinky-combinators": "~0.1.1",
     "pinky-for-fun": "~0.2.0",
     "pinky": "~0.1.2",
     "mocha-as-promised": "~1.2.1",

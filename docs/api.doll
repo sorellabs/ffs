@@ -37,6 +37,7 @@ Module file
 
 
 Module path
+  exists :: String -> Promise Bool
   move :: String -> String -> Promise ()
   copy :: String -> String -> Promise ()
   copy-recursive :: String -> String -> Promise ()

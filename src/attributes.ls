@@ -29,7 +29,7 @@ fs = require 'fs'
 path = require 'path'
 {lift-node} = require 'pinky-for-fun'
 {pipeline, all} = require 'pinky-combinators'
-
+{walk-tree} = require './utils'
 
 ### -- Attributes ------------------------------------------------------
 
@@ -116,30 +116,10 @@ change-link-owner = (user-id, group-id, path-name) -->
 # sub-directories/files.
 #
 # :: UserID -> GroupID -> String -> Promise String
-list-dir = lift-node fs.readdir
 change-owner-recursive = (user-id, group-id, path-name) -->
-  promise    = pinky!
-  change-one = change-owner user-id, group-id
+  (path-name |> walk-tree (change-owner user-id, group-id)) .then do
+    * -> promise.fulfill path-name
 
-  (status path-name).then (info) ->
-    | info.is-file!      => change-one path-name .then do
-                              * -> promise.fulfill path-name
-                              * promise.reject
-    | info.is-directory! => change-whole-subtree!
-
-  return promise
-
-  function change-whole-subtree()
-    keep-changing = change-owner-recursive user-id, group-id
-    files         = list-dir path-name
-    change-files  = files.then (xs) -> xs.map keep-changing . fix-path
-
-    pipeline [ (all change-files), change-one path-name ].then do
-      * -> promise.fulfill path-name
-      * promise.reject
-    
-  function fix-path(file-name)
-    path.resolve path-name, file-name
 
 
 ### -- File modes ------------------------------------------------------
@@ -179,28 +159,8 @@ change-link-mode = (mode, path-name) -->
 #
 # :: FileMode -> String -> Promise String
 change-mode-recursive = (mode, path-name) -->
-  promise    = pinky!
-  change-one = change-mode mode
-
-  (status path-name).then (info) ->
-    | info.is-file!      => change-one path-name .then do
-                              * -> promise.fulfill path-name
-                              * promise.reject
-    | info.is-directory! => change-whole-subtree!
-
-  return promise
-
-  function change-whole-subtree()
-    keep-changing = change-mode-recursive user-id, group-id
-    files         = list-dir path-name
-    change-files  = files.then (xs) -> xs.map keep-changing . fix-path
-
-    pipeline [ (all change-files), change-one path-name ].then do
-      * -> promise.fulfill path-name
-      * promise.reject
-    
-  function fix-path(file-name)
-    path.resolve path-name, file-name
+  (path-name |> walk-tree (change-mode mode)).then do
+    * -> promise.fulfill path-name
   
 
 

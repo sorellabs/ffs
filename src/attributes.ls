@@ -117,8 +117,12 @@ change-link-owner = (user-id, group-id, path-name) -->
 #
 # :: UserID -> GroupID -> String -> Promise String
 change-owner-recursive = (user-id, group-id, path-name) -->
+  promise = pinky!
   (path-name |> walk-tree (change-owner user-id, group-id)) .then do
     * -> promise.fulfill path-name
+    * promise.reject
+
+  return promise
 
 
 
@@ -159,8 +163,12 @@ change-link-mode = (mode, path-name) -->
 #
 # :: FileMode -> String -> Promise String
 change-mode-recursive = (mode, path-name) -->
+  promise = pinky!
   (path-name |> walk-tree (change-mode mode)).then do
     * -> promise.fulfill path-name
+    * promise.reject
+
+  return promise
   
 
 

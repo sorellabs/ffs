@@ -3,9 +3,6 @@ ffs = require '../../lib'
 $ = require '../../lib/attributes'
 {all, pipeline} = require 'pinky-combinators'
 
-o777 = parse-int '0777', 8
-
-
 
 describe 'λ status' ->
   o 'Should return a Stats object for the file node.' ->
@@ -53,29 +50,29 @@ describe 'λ change-owner-recursive' ->
 
 describe 'λ change-mode' ->
   o 'Should change the mode of the file.' ->
-     change = -> $.change-mode o777, 'root/bin/cp'
-     mode   = -> ($.status 'root/bin/cp').then (-> it.mode .&. o777)
-     check  = -> expect (mode!) .to.become o777
+     change = -> $.change-mode 8~700, 'root/bin/cp'
+     mode   = -> ($.status 'root/bin/cp').then (-> it.mode .&. 8~700)
+     check  = -> expect (mode!) .to.become 8~700
 
      pipeline [ change, check ]
 
 # Only available on Mac OS/X
 xdescribe 'λ change-link-mode' ->
   o 'Should change the mode of the link.' ->
-     change = -> $.change-link-mode o777, 'root/bin/l'
-     mode   = -> ($.link-status 'root/bin/cp').then (-> it.mode .&. o777)
-     check  = -> expect (mode!) .to.become o777
+     change = -> $.change-link-mode 8~700, 'root/bin/l'
+     mode   = -> ($.link-status 'root/bin/cp').then (-> it.mode .&. 8~700)
+     check  = -> expect (mode!) .to.become 8~700
 
      pipeline [change, check]
 
 describe 'λ change-mode-recursive' ->
   o 'Should change the mode of everything in a directory.' ->
      debugger
-     change         = -> $.change-mode-recursive o777, 'root/etc'
-     mode           = -> ($.status it) .then -> it.mode .&. o777
+     change         = -> $.change-mode-recursive 8~700, 'root/etc'
+     mode           = -> ($.status it) .then -> it.mode .&. 8~700
      status         = -> all (it.map mode)
      files          = ffs.list-recursive 'root/etc'
-     expected-modes = files.then (-> it.map (-> o777))
+     expected-modes = files.then (-> it.map (-> 8~700))
      check          = -> expected-modes.then ->
                           (expect (files.then status) .to.become it)
 

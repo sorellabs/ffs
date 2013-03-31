@@ -67,6 +67,9 @@
   "dependencies": {
     "pinky-combinators": "~0.1.0",
     "pinky-for-fun": "~0.2.0",
-    "pinky": "~0.1.2"
+    "pinky": "~0.1.2",
+    "mocha-as-promised": "~1.2.1",
+    "chai-as-promised": "~3.2.5",
+    "chai": "~1.5.0"
   }
 }

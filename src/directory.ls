@@ -46,38 +46,33 @@ parent = (p) -> path.resolve p, '..'
 ### -- Creating directories --------------------------------------------
 
 #### λ make
-# Creates the directory defined by `path`.
+# Creates the directory defined by `path-name`.
 #
 # This fails if any of the parents of such directory are not present, or
 # if the directory itself already exists. To recursively create all
 # directories in a given `path`, use `make-recursive`.
 #
-# :: Mode -> String -> Promise String FileError
+# :: Mode -> String -> Promise () FileError
 mkdir = lift-node fs.mkdir
-make = (mode, path) -->
-  promise = pinky!
-  (mkdir path, mode).then do
-                          * -> promise.fulfill path
-                          * promise.reject
-  return promise
+make = (mode, path-name) --> mkdir path-name, mode
 
 
 #### λ make-recursive
-# Creates the directory defined by `path`, and all of its pernt
+# Creates the directory defined by `path-name`, and all of its pernt
 # directories.
 #
-# :: Mode -> String -> Promise String FileError
-make-recursive = (mode, path) -->
+# :: Mode -> String -> Promise () FileError
+make-recursive = (mode, path-name) -->
   promise = pinky!
-  (make mode, path).then do
-    * (_)     -> promise.fulfill path
+  (make mode, path-name).then do
+    * (_)     -> promise.fulfill!
     * (error) ->
-              | already-exists error => promise.fulfill path
+              | already-exists error => promise.fulfill!
               | doesnt-exist error   => do
-                                        p = pipeline [ (-> make mode, parent path)
-                                                       (-> make mode, path) ]
+                                        p = pipeline [ (-> make mode, parent path-name)
+                                                       (-> make mode, path-name) ]
                                         p.then do
-                                               * -> promise.fulfill path
+                                               * -> promise.fulfill!
                                                * promise.reject
   return promise
 

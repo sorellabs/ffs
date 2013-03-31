@@ -85,14 +85,10 @@ is-directory = (path-name) -> (status path-name).then (.is-directory!)
 #
 # See also: `chown(2)`
 #
-# :: UserID -> GroupID -> String -> Promise String
+# :: UserID -> GroupID -> String -> Promise ()
 chown = lift-node fs.chown
 change-owner = (user-id, group-id, path-name) -->
-  promise = pinky!
-  (chown path-name, user-id, group-id).then do
-                                            * -> promise.fulfill path-name
-                                            * promise.reject
-  return promise
+  chown path-name, user-id, group-id
 
 
 #### λ change-link-owner
@@ -101,25 +97,21 @@ change-owner = (user-id, group-id, path-name) -->
 #
 # See also: `lchown(2)`, `change-owner`
 #
-# :: UserID -> GroupID -> String -> Promise String
+# :: UserID -> GroupID -> String -> Promise ()
 lchown = lift-node fs.lchown
 change-link-owner = (user-id, group-id, path-name) -->
-  promise = pinky!
-  (chown path-name, user-id, group-id).then do
-                                            * -> promise.fulfill path-name
-                                            * promise.reject
-  return promise                                       
+  lchown path-name, user-id, group-id
 
 
 #### λ change-owner-recursive
 # Like `change-owner`, but also changes the ownership of
 # sub-directories/files.
 #
-# :: UserID -> GroupID -> String -> Promise String
+# :: UserID -> GroupID -> String -> Promise ()
 change-owner-recursive = (user-id, group-id, path-name) -->
   promise = pinky!
   (path-name |> walk-tree (change-owner user-id, group-id)) .then do
-    * -> promise.fulfill path-name
+    * -> promise.fulfill!
     * promise.reject
 
   return promise
@@ -133,14 +125,10 @@ change-owner-recursive = (user-id, group-id, path-name) -->
 #
 # See also: `chmod(2)`
 #
-# :: FileMode -> String -> Promise String
+# :: FileMode -> String -> Promise ()
 chmod = lift-node fs.chmod
-change-mode = (mode, path-name) -->
-  promise = pinky!
-  (chmod path-name, mode).then do
-                               * -> promise.fulfill path-name
-                               * promise.reject
-  return promise
+change-mode = (mode, path-name) --> chmod path-name, mode
+
 
 #### λ change-link-mode
 # Changes the mode of a single file node, without dereferencing symbolic
@@ -148,24 +136,19 @@ change-mode = (mode, path-name) -->
 #
 # See also: `lchmod(2)`
 #
-# :: FileMode -> String -> Promise String
+# :: FileMode -> String -> Promise ()
 lchmod = lift-node fs.lchmod
-change-link-mode = (mode, path-name) -->
-  promise = pinky!
-  (lchmod path-name, mode).then do
-                                * -> promise.fulfill path-name
-                                * promise.reject
-  return promise
+change-link-mode = (mode, path-name) --> lchmod path-name, mode
 
 
 #### λ change-mode-recursive
 # Changes the mode of all files within the given path.
 #
-# :: FileMode -> String -> Promise String
+# :: FileMode -> String -> Promise ()
 change-mode-recursive = (mode, path-name) -->
   promise = pinky!
   (path-name |> walk-tree (change-mode mode)).then do
-    * -> promise.fulfill path-name
+    * -> promise.fulfill!
     * promise.reject
 
   return promise

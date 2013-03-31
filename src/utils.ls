@@ -53,8 +53,8 @@ walk-tree = (stepper, path-name) -->
   function dive-in()
     keep-stepping = walk-tree stepper
     files         = list path-name
-    step-files    = files.then (xs) -> all (xs.map (keep-stepping . fix-path))
-    return pipeline [ step-files, stepper path-name ]
+    step-files    = -> files.then (xs) -> all (xs.map (keep-stepping . fix-path))
+    return pipeline [ step-files, (-> stepper path-name) ]
 
   # adds the current relative path to the file name.
   function fix-path(file-name) => path.join path-name, file-name
